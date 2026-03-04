@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fuelr — Fuel your next move.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flyonui@2.4.1/flyonui.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          fuel: '#C8FF2E',
+          fuelDark: '#0A0A0A',
+          fuelGray: '#161616',
+          fuelMid: '#1E1E1E',
+          fuelText: '#A1A1A1',
+          fuelLight: '#F5F5F5',
+        },
+        fontFamily: {
+          display: ['Space Grotesk', 'sans-serif'],
+          body: ['Inter', 'sans-serif'],
+        }
+      }
+    }
+  }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { background-color: #0A0A0A; color: #F5F5F5; font-family: 'Inter', sans-serif; }
+
+    /* Animated gradient mesh behind hero */
+    .hero-glow {
+      position: absolute;
+      top: -30%;
+      left: -20%;
+      width: 140%;
+      height: 160%;
+      background:
+        radial-gradient(ellipse at 30% 40%, rgba(200, 255, 46, 0.08) 0%, transparent 55%),
+        radial-gradient(ellipse at 70% 60%, rgba(200, 255, 46, 0.05) 0%, transparent 50%);
+      animation: glowDrift 18s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes glowDrift {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(-3%, 2%) scale(1.05); }
+    }
+
+    /* Scroll animations */
+    [data-animate] {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    [data-animate].animate-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    [data-animate][data-delay="1"] { transition-delay: 0.1s; }
+    [data-animate][data-delay="2"] { transition-delay: 0.2s; }
+    [data-animate][data-delay="3"] { transition-delay: 0.3s; }
+    [data-animate][data-delay="4"] { transition-delay: 0.4s; }
+
+    /* Stat counter pulse */
+    .stat-glow {
+      text-shadow: 0 0 40px rgba(200, 255, 46, 0.3);
+    }
+
+    /* Nav blur */
+    .nav-glass {
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(10, 10, 10, 0.6);
+      border: 1px solid rgba(200, 255, 46, 0.1);
+    }
+
+    /* Phone mockup custom glow */
+    .phone-glow {
+      filter: drop-shadow(0 0 60px rgba(200, 255, 46, 0.15));
+    }
+
+    /* Danger stripe */
+    .danger-stripe {
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 10px,
+        rgba(200, 255, 46, 0.03) 10px,
+        rgba(200, 255, 46, 0.03) 20px
+      );
+    }
+
+    /* Animated underline on hover */
+    .fuel-link {
+      position: relative;
+    }
+    .fuel-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: #C8FF2E;
+      transition: width 0.3s ease;
+    }
+    .fuel-link:hover::after {
+      width: 100%;
+    }
+
+    /* Smooth number animation */
+    @keyframes countUp {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .count-in {
+      animation: countUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Step connector line */
+    .step-line {
+      position: relative;
+    }
+    .step-line::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: -1.5rem;
+      width: 3rem;
+      height: 2px;
+      background: linear-gradient(to right, rgba(200, 255, 46, 0.4), transparent);
+    }
+    @media (max-width: 768px) {
+      .step-line::after { display: none; }
+    }
+  </style>
+</head>
+<body class="overflow-x-hidden">
+
+  <!-- ==================== FLOATING PILL NAV ==================== -->
+  <nav class="fixed top-5 left-1/2 -translate-x-1/2 z-50 nav-glass rounded-full px-6 py-3 flex items-center gap-6" id="mainNav">
+    <a href="#" class="font-display font-bold text-lg text-fuel tracking-tight">Fuelr</a>
+    <div class="hidden sm:flex items-center gap-5">
+      <a href="#why" class="fuel-link text-sm text-fuelText hover:text-fuelLight transition-colors">Why we exist</a>
+      <a href="#how" class="text-sm bg-fuel text-fuelDark font-semibold px-4 py-1.5 rounded-full hover:bg-fuelLight transition-colors">See how it works</a>
+    </div>
+  </nav>
+
+
+  <!-- ==================== HERO — STATS-LED ==================== -->
+  <section class="relative min-h-screen flex flex-col justify-center items-center text-center px-6 pt-24 pb-16">
+    <div class="hero-glow"></div>
+
+    <div class="relative z-10 max-w-4xl mx-auto">
+      <!-- Stats first — the numbers hit before anything else -->
+      <div class="flex flex-wrap justify-center gap-8 md:gap-14 mb-12" data-animate>
+        <div class="text-center">
+          <div class="font-display text-5xl md:text-6xl font-bold text-fuel stat-glow" data-count="3">3</div>
+          <div class="text-sm text-fuelText mt-1 uppercase tracking-wider">minutes to funded</div>
+        </div>
+        <div class="text-center" data-animate data-delay="1">
+          <div class="font-display text-5xl md:text-6xl font-bold text-fuel stat-glow">0</div>
+          <div class="text-sm text-fuelText mt-1 uppercase tracking-wider">paperwork</div>
+        </div>
+        <div class="text-center" data-animate data-delay="2">
+          <div class="font-display text-5xl md:text-6xl font-bold text-fuel stat-glow">4</div>
+          <div class="text-sm text-fuelText mt-1 uppercase tracking-wider">products, one flow</div>
+        </div>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="font-display text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.95] mb-6" data-animate data-delay="1">
+        Fuel your next<br>
+        <span class="text-fuel">move.</span>
+      </h1>
+
+      <!-- Sub-headline -->
+      <p class="text-lg md:text-xl text-fuelText max-w-2xl mx-auto mb-10 leading-relaxed" data-animate data-delay="2">
+        Lending, working capital, leasing, and real estate financing — instant, embedded, and ready inside the tools you already use.
+      </p>
+
+      <!-- CTA -->
+      <div data-animate data-delay="3">
+        <a href="#how" class="inline-flex items-center gap-2 bg-fuel text-fuelDark font-display font-bold text-lg px-8 py-4 rounded-full hover:bg-fuelLight hover:scale-105 transition-all duration-300">
+          See how it works
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40">
+      <div class="w-5 h-8 border-2 border-fuelText rounded-full flex justify-center pt-1.5">
+        <div class="w-1 h-2 bg-fuelText rounded-full animate-bounce"></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== PROBLEM — THE BOTTLENECK ==================== -->
+  <section id="why" class="relative py-24 md:py-32">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="grid md:grid-cols-2 gap-12 md:gap-20 items-center">
+
+        <!-- Left: provocation -->
+        <div data-animate>
+          <span class="inline-block text-xs font-semibold uppercase tracking-[0.2em] text-fuel mb-4 bg-fuel/10 px-3 py-1 rounded-full">The problem</span>
+          <h2 class="font-display text-3xl md:text-5xl font-bold leading-tight mb-6">
+            Banking is the<br><span class="text-fuelText">bottleneck.</span>
+          </h2>
+          <p class="text-fuelText text-lg leading-relaxed">
+            You run your business in the cloud. You make decisions in minutes. But the moment you need financing, everything stops. Applications, documents, waiting, committees — your bank operates on a timeline from 2005.
+          </p>
+          <p class="text-fuelLight font-medium mt-4 text-lg">
+            Meanwhile, your competitors already got funded and moved on.
+          </p>
+        </div>
+
+        <!-- Right: the old way vs Fuelr -->
+        <div data-animate data-delay="2">
+          <div class="bg-fuelGray rounded-2xl border border-white/5 overflow-hidden">
+            <!-- Old way -->
+            <div class="p-6 border-b border-white/5">
+              <div class="text-xs uppercase tracking-widest text-fuelText/60 mb-3">Your bank</div>
+              <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 rounded-full bg-red-500/80"></div>
+                  <span class="text-fuelText">3 weeks for a credit decision</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 rounded-full bg-red-500/80"></div>
+                  <span class="text-fuelText">14 documents uploaded manually</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 rounded-full bg-red-500/80"></div>
+                  <span class="text-fuelText">Separate portals per product</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 rounded-full bg-red-500/80"></div>
+                  <span class="text-fuelText">"We'll call you back"</span>
+                </div>
+              </div>
+            </div>
+            <!-- Fuelr way -->
+            <div class="p-6 bg-fuel/[0.03]">
+              <div class="text-xs uppercase tracking-widest text-fuel mb-3">Fuelr</div>
+              <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 rounded-full bg-fuel"></div>
+                  <span class="text-fuelLight">3 minutes. Done.</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 rounded-full bg-fuel"></div>
+                  <span class="text-fuelLight">Zero paperwork — we read your live data</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 rounded-full bg-fuel"></div>
+                  <span class="text-fuelLight">All products, one flow</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 rounded-full bg-fuel"></div>
+                  <span class="text-fuelLight">Already in your software</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== SOLUTION — CREDIT AT SPEED ==================== -->
+  <section class="py-24 md:py-32 relative">
+    <div class="max-w-6xl mx-auto px-6">
+
+      <div class="text-center mb-16" data-animate>
+        <span class="inline-block text-xs font-semibold uppercase tracking-[0.2em] text-fuel mb-4 bg-fuel/10 px-3 py-1 rounded-full">What we do</span>
+        <h2 class="font-display text-3xl md:text-5xl font-bold">Credit at the speed of business.</h2>
+      </div>
+
+      <!-- Three features — alternating layout, NOT a card grid -->
+      <div class="space-y-20 md:space-y-28">
+
+        <!-- Feature 1: Instant decisions -->
+        <div class="grid md:grid-cols-5 gap-8 items-center" data-animate>
+          <div class="md:col-span-2 flex justify-center md:justify-start">
+            <div class="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-fuel/10 flex items-center justify-center">
+              <svg class="w-12 h-12 md:w-16 md:h-16 text-fuel" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>
+              </svg>
+            </div>
+          </div>
+          <div class="md:col-span-3">
+            <h3 class="font-display text-2xl md:text-3xl font-bold mb-3">Instant decisions</h3>
+            <p class="text-fuelText text-lg leading-relaxed">Real-time risk assessment based on your live data. No committees, no waiting. Apply and get funded in minutes.</p>
+          </div>
+        </div>
+
+        <!-- Feature 2: Embedded everywhere -->
+        <div class="grid md:grid-cols-5 gap-8 items-center" data-animate>
+          <div class="md:col-span-3 md:order-1">
+            <h3 class="font-display text-2xl md:text-3xl font-bold mb-3">Embedded everywhere</h3>
+            <p class="text-fuelText text-lg leading-relaxed">Fuelr lives inside your accounting software, ERP, and e-commerce platform. Financing appears exactly when you need it — no bank portal required.</p>
+          </div>
+          <div class="md:col-span-2 md:order-2 flex justify-center md:justify-end">
+            <div class="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-fuel/10 flex items-center justify-center">
+              <svg class="w-12 h-12 md:w-16 md:h-16 text-fuel" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 3: One platform, every product -->
+        <div class="grid md:grid-cols-5 gap-8 items-center" data-animate>
+          <div class="md:col-span-2 flex justify-center md:justify-start">
+            <div class="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-fuel/10 flex items-center justify-center">
+              <svg class="w-12 h-12 md:w-16 md:h-16 text-fuel" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L12 12.75 6.429 9.75m11.142 0l4.179 2.25L12 17.25 2.25 12l4.179-2.25m11.142 0l4.179 2.25L12 22.5l-9.75-5.25 4.179-2.25"/>
+              </svg>
+            </div>
+          </div>
+          <div class="md:col-span-3">
+            <h3 class="font-display text-2xl md:text-3xl font-bold mb-3">One platform, every product</h3>
+            <p class="text-fuelText text-lg leading-relaxed">Working capital, term loans, leasing, real estate — all in one seamless flow. No separate applications, no duplicate paperwork, no product silos.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== PRODUCT SHOWCASE — THREE STEPS ==================== -->
+  <section id="how" class="py-24 md:py-32 relative">
+    <div class="absolute inset-0 bg-gradient-to-b from-fuelGray/50 via-fuelGray/80 to-fuelDark pointer-events-none"></div>
+
+    <div class="relative z-10 max-w-6xl mx-auto px-6">
+      <div class="text-center mb-16" data-animate>
+        <span class="inline-block text-xs font-semibold uppercase tracking-[0.2em] text-fuel mb-4 bg-fuel/10 px-3 py-1 rounded-full">How it works</span>
+        <h2 class="font-display text-3xl md:text-5xl font-bold">Three steps. Zero friction.</h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
+
+        <!-- Left: Steps -->
+        <div class="space-y-10">
+          <!-- Step 1 -->
+          <div class="flex gap-5" data-animate>
+            <div class="flex-shrink-0">
+              <div class="w-12 h-12 rounded-full bg-fuel text-fuelDark font-display font-bold text-lg flex items-center justify-center">1</div>
+            </div>
+            <div>
+              <h3 class="font-display text-xl font-bold mb-1">Connect your tools</h3>
+              <p class="text-fuelText leading-relaxed">Link your accounting software or ERP. Fuelr reads your financials in real time.</p>
+            </div>
+          </div>
+
+          <!-- Connector -->
+          <div class="ml-6 w-px h-6 bg-gradient-to-b from-fuel/40 to-transparent" data-animate data-delay="1"></div>
+
+          <!-- Step 2 -->
+          <div class="flex gap-5" data-animate data-delay="1">
+            <div class="flex-shrink-0">
+              <div class="w-12 h-12 rounded-full bg-fuel text-fuelDark font-display font-bold text-lg flex items-center justify-center">2</div>
+            </div>
+            <div>
+              <h3 class="font-display text-xl font-bold mb-1">See your options</h3>
+              <p class="text-fuelText leading-relaxed">Instant offers for lending, working capital, leasing, or real estate financing — tailored to your business, right now.</p>
+            </div>
+          </div>
+
+          <!-- Connector -->
+          <div class="ml-6 w-px h-6 bg-gradient-to-b from-fuel/40 to-transparent" data-animate data-delay="2"></div>
+
+          <!-- Step 3 -->
+          <div class="flex gap-5" data-animate data-delay="2">
+            <div class="flex-shrink-0">
+              <div class="w-12 h-12 rounded-full bg-fuel text-fuelDark font-display font-bold text-lg flex items-center justify-center">3</div>
+            </div>
+            <div>
+              <h3 class="font-display text-xl font-bold mb-1">Get funded</h3>
+              <p class="text-fuelText leading-relaxed">Accept and receive funds in your account. Minutes, not months.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Phone Mockup -->
+        <div class="flex justify-center" data-animate data-delay="2">
+          <div class="phone-glow">
+            <div class="mockup-phone border-fuel/20">
+              <div class="mockup-phone-display">
+                <!-- Simulated app UI inside phone -->
+                <div class="bg-fuelDark w-full h-full flex flex-col" style="min-height: 480px;">
+                  <!-- Status bar -->
+                  <div class="flex justify-between items-center px-5 pt-4 pb-2">
+                    <span class="text-xs text-fuelText">9:41</span>
+                    <div class="flex gap-1">
+                      <div class="w-4 h-2 rounded-sm bg-fuel"></div>
+                    </div>
+                  </div>
+                  <!-- App header -->
+                  <div class="px-5 pt-2 pb-4">
+                    <span class="text-fuel font-display font-bold text-lg">Fuelr</span>
+                    <p class="text-fuelText text-xs mt-0.5">Your financing options</p>
+                  </div>
+                  <!-- Offer cards -->
+                  <div class="px-4 space-y-3 flex-1">
+                    <!-- Offer 1 -->
+                    <div class="bg-fuelGray rounded-xl p-4 border border-white/5">
+                      <div class="flex justify-between items-start mb-2">
+                        <div>
+                          <div class="text-xs text-fuel font-semibold uppercase tracking-wider">Working Capital</div>
+                          <div class="font-display text-2xl font-bold text-fuelLight mt-1">€200,000</div>
+                        </div>
+                        <span class="text-[10px] bg-fuel/20 text-fuel px-2 py-0.5 rounded-full font-semibold">Best match</span>
+                      </div>
+                      <div class="flex gap-4 text-xs text-fuelText mt-2">
+                        <span>2.1% rate</span>
+                        <span>12 months</span>
+                        <span>No collateral</span>
+                      </div>
+                      <button class="w-full mt-3 bg-fuel text-fuelDark text-sm font-bold py-2.5 rounded-lg">Accept offer</button>
+                    </div>
+                    <!-- Offer 2 -->
+                    <div class="bg-fuelGray rounded-xl p-4 border border-white/5">
+                      <div class="flex justify-between items-start mb-2">
+                        <div>
+                          <div class="text-xs text-fuelText font-semibold uppercase tracking-wider">Equipment Leasing</div>
+                          <div class="font-display text-2xl font-bold text-fuelLight mt-1">€85,000</div>
+                        </div>
+                      </div>
+                      <div class="flex gap-4 text-xs text-fuelText mt-2">
+                        <span>3.4% rate</span>
+                        <span>36 months</span>
+                        <span>Asset-backed</span>
+                      </div>
+                      <button class="w-full mt-3 bg-fuelMid text-fuelLight text-sm font-semibold py-2.5 rounded-lg border border-white/10">View details</button>
+                    </div>
+                    <!-- Offer 3 (partial) -->
+                    <div class="bg-fuelGray rounded-xl p-4 border border-white/5 opacity-70">
+                      <div class="text-xs text-fuelText font-semibold uppercase tracking-wider">Term Loan</div>
+                      <div class="font-display text-2xl font-bold text-fuelLight mt-1">€500,000</div>
+                    </div>
+                  </div>
+                  <!-- Bottom nav -->
+                  <div class="flex justify-around py-3 border-t border-white/5 mt-2">
+                    <div class="flex flex-col items-center gap-0.5">
+                      <svg class="w-5 h-5 text-fuel" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+                      <span class="text-[10px] text-fuel">Home</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                      <svg class="w-5 h-5 text-fuelText" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+                      <span class="text-[10px] text-fuelText">Insights</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                      <svg class="w-5 h-5 text-fuelText" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      <span class="text-[10px] text-fuelText">Settings</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== DANGER ZONE ==================== -->
+  <section class="py-24 md:py-32 relative danger-stripe">
+    <div class="max-w-4xl mx-auto px-6">
+
+      <div data-animate>
+        <span class="inline-block text-xs font-semibold uppercase tracking-[0.2em] text-fuel mb-6 bg-fuel/10 px-3 py-1 rounded-full">Why existing players should worry</span>
+      </div>
+
+      <!-- Bold statement -->
+      <h2 class="font-display text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-12" data-animate>
+        Your bank still thinks a 3-week credit decision is fast.<br>
+        <span class="text-fuel">We do it in 3 minutes.</span>
+      </h2>
+
+      <!-- Danger bullets — not cards, just sharp statements with icons -->
+      <div class="space-y-8">
+        <div class="flex items-start gap-5 group" data-animate>
+          <div class="w-10 h-10 rounded-lg bg-fuel/10 flex items-center justify-center flex-shrink-0 group-hover:bg-fuel/20 transition-colors">
+            <svg class="w-5 h-5 text-fuel" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z"/>
+            </svg>
+          </div>
+          <p class="text-lg text-fuelText leading-relaxed pt-1.5">
+            <span class="text-fuelLight font-semibold">We automate what banks need entire departments for</span> — KYC, risk, underwriting — all instant.
+          </p>
+        </div>
+
+        <div class="flex items-start gap-5 group" data-animate data-delay="1">
+          <div class="w-10 h-10 rounded-lg bg-fuel/10 flex items-center justify-center flex-shrink-0 group-hover:bg-fuel/20 transition-colors">
+            <svg class="w-5 h-5 text-fuel" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"/>
+            </svg>
+          </div>
+          <p class="text-lg text-fuelText leading-relaxed pt-1.5">
+            <span class="text-fuelLight font-semibold">We embed where banks can't reach</span> — inside your software, at the moment you need capital.
+          </p>
+        </div>
+
+        <div class="flex items-start gap-5 group" data-animate data-delay="2">
+          <div class="w-10 h-10 rounded-lg bg-fuel/10 flex items-center justify-center flex-shrink-0 group-hover:bg-fuel/20 transition-colors">
+            <svg class="w-5 h-5 text-fuel" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </div>
+          <p class="text-lg text-fuelText leading-relaxed pt-1.5">
+            <span class="text-fuelLight font-semibold">We say yes to businesses banks won't touch</span> — because our data is better and our risk models are smarter.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== CUSTOMER SECTION — TESTIMONIAL ==================== -->
+  <section class="py-24 md:py-32">
+    <div class="max-w-4xl mx-auto px-6">
+
+      <div class="text-center mb-12" data-animate>
+        <span class="inline-block text-xs font-semibold uppercase tracking-[0.2em] text-fuel mb-4 bg-fuel/10 px-3 py-1 rounded-full">Built for you</span>
+        <h2 class="font-display text-3xl md:text-5xl font-bold">Built for businesses<br>that move fast.</h2>
+        <p class="text-fuelText text-lg mt-4 max-w-xl mx-auto">Digital-native SMEs in trade and retail who need capital to grow — not a relationship manager to hold their hand.</p>
+      </div>
+
+      <!-- Large single testimonial — blockquote style -->
+      <div class="relative" data-animate data-delay="1">
+        <div class="bg-fuelGray rounded-3xl p-8 md:p-12 border border-white/5 relative overflow-hidden">
+          <!-- Decorative quote mark -->
+          <div class="absolute top-4 left-6 text-fuel/10 font-display text-[120px] leading-none select-none">"</div>
+
+          <div class="relative z-10">
+            <blockquote class="text-xl md:text-2xl text-fuelLight leading-relaxed font-medium mb-8">
+              "I needed €200K in working capital to stock up before peak season. My bank wanted three weeks of paperwork. Fuelr funded me the same afternoon."
+            </blockquote>
+
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-full bg-fuel/20 flex items-center justify-center">
+                <span class="font-display font-bold text-fuel text-lg">LV</span>
+              </div>
+              <div>
+                <div class="font-semibold text-fuelLight">Lisa de Vries</div>
+                <div class="text-sm text-fuelText">Founder — BrightGoods (online retail, 22 employees)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trust indicators -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12" data-animate data-delay="2">
+        <div class="text-center">
+          <div class="font-display text-3xl font-bold text-fuel">2,400+</div>
+          <div class="text-sm text-fuelText mt-1">businesses funded</div>
+        </div>
+        <div class="text-center">
+          <div class="font-display text-3xl font-bold text-fuel">€1.2B</div>
+          <div class="text-sm text-fuelText mt-1">capital deployed</div>
+        </div>
+        <div class="text-center">
+          <div class="font-display text-3xl font-bold text-fuel">3 min</div>
+          <div class="text-sm text-fuelText mt-1">avg. decision time</div>
+        </div>
+        <div class="text-center">
+          <div class="font-display text-3xl font-bold text-fuel">4.8/5</div>
+          <div class="text-sm text-fuelText mt-1">Trustpilot rating</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== CTA — FULL-WIDTH BOLD ==================== -->
+  <section class="py-24 md:py-32 relative overflow-hidden">
+    <div class="absolute inset-0 bg-fuel"></div>
+    <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle, #0A0A0A 1px, transparent 1px); background-size: 20px 20px;"></div>
+
+    <div class="relative z-10 max-w-3xl mx-auto px-6 text-center" data-animate>
+      <h2 class="font-display text-4xl md:text-6xl font-bold text-fuelDark leading-tight mb-6">
+        Stop waiting.<br>Start fueling.
+      </h2>
+      <p class="text-fuelDark/70 text-lg mb-10 max-w-lg mx-auto">
+        Join 2,400+ businesses that got funded in minutes — not months.
+      </p>
+      <a href="#" class="inline-flex items-center gap-2 bg-fuelDark text-fuel font-display font-bold text-lg px-8 py-4 rounded-full hover:bg-fuelGray hover:scale-105 transition-all duration-300">
+        Get started free
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+      </a>
+    </div>
+  </section>
+
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="py-12 border-t border-white/5">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="flex items-center gap-3">
+          <span class="font-display font-bold text-xl text-fuel">Fuelr</span>
+          <span class="text-fuelText text-sm">— Fuel your next move.</span>
+        </div>
+        <div class="text-sm text-fuelText">
+          &copy; 2026 Fuelr &middot; Built at AI Lab
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- FlyonUI JS -->
+  <script src="https://cdn.jsdelivr.net/npm/flyonui@2.4.1/flyonui.js"></script>
+
+  <!-- Scroll animations + interactions -->
+  <script>
+    // Scroll-triggered animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    document.querySelectorAll('[data-animate]').forEach(el => observer.observe(el));
+
+    // Nav opacity on scroll
+    const nav = document.getElementById('mainNav');
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      if (scrollY > 100) {
+        nav.style.background = 'rgba(10, 10, 10, 0.85)';
+        nav.style.borderColor = 'rgba(200, 255, 46, 0.15)';
+      } else {
+        nav.style.background = 'rgba(10, 10, 10, 0.6)';
+        nav.style.borderColor = 'rgba(200, 255, 46, 0.1)';
+      }
+      lastScroll = scrollY;
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Animate stat numbers on scroll
+    function animateValue(element, start, end, duration) {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        element.textContent = Math.floor(eased * (end - start) + start);
+        if (progress < 1) window.requestAnimationFrame(step);
+      };
+      window.requestAnimationFrame(step);
+    }
+
+    const statObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const countEl = entry.target;
+          const target = parseInt(countEl.getAttribute('data-count'));
+          if (target) animateValue(countEl, 0, target, 800);
+          countEl.classList.add('count-in');
+          statObserver.unobserve(countEl);
+        }
+      });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('[data-count]').forEach(el => statObserver.observe(el));
+  </script>
+
+</body>
+</html>
